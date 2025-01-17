@@ -54,10 +54,18 @@
 
         setTaskTimes((prev) => {
           const previousTime = prev[taskKey]?.totalTime || 0;
+          const sessionLog = prev[taskKey]?.sessions || [];
           const newEntry = {
             totalTime: previousTime + elapsed,
             lastStart: new Date(startTime).toLocaleTimeString(),
             lastEnd: new Date().toLocaleTimeString(),
+            sessions: [
+              ...sessionLog,
+              {
+                start: new Date(startTime).toLocaleTimeString(),
+                end: new Date().toLocaleTimeString(),
+              },
+            ],
           };
           return { ...prev, [taskKey]: newEntry };
         });
