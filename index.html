@@ -97,11 +97,12 @@
         React.createElement('h1', null, 'Time Tracker'),
         React.createElement(
           'div',
-          { style: { display: 'flex', gap: '10px' } },
+          { style: { display: 'flex', flexDirection: 'column', gap: '10px' } },
           tasks.map((task) => {
             const taskKey = `${task}_${today}`;
             const totalTime = taskTimes[taskKey]?.totalTime || 0;
             const elapsedTime = currentTask === task && startTime ? currentTime - startTime : 0;
+            const currentSessionTime = currentTask === task && startTime ? formatTime(elapsedTime) : null;
             return React.createElement(
               'button',
               {
@@ -114,9 +115,12 @@
                   border: 'none',
                   borderRadius: '5px',
                   cursor: 'pointer',
+                  textAlign: 'left',
                 },
               },
-              `${task} (${formatTime(totalTime + elapsedTime)})`
+              React.createElement('div', null, task),
+              React.createElement('div', { style: { fontSize: '0.9em', marginTop: '5px' } }, `Total: ${formatTime(totalTime)}`),
+              currentSessionTime && React.createElement('div', { style: { fontSize: '0.9em' } }, `Current: ${currentSessionTime}`)
             );
           })
         ),
