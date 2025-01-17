@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Time Tracker</title>
+  <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+</head>
+<body>
+  <div id="root"></div>
+  <script>
+    const { useState, useEffect } = React;
+
+    const TimeTracker = () => {
+      const tasks = ['Work', 'Startup', 'Fitness', 'Leisure', 'Other'];
+      const [currentTask, setCurrentTask] = useState(null);
+      const [taskTimes, setTaskTimes] = useState({});
+      const [startTime, setStartTime] = useState(null);
+      const [currentTime, setCurrentTime] = useState(Date.now());
+
+      useEffect(() => {
+        const storedTimes = JSON.parse(localStorage.getItem('taskTimes')) || {};
+        setTaskTimes(storedTimes);
+      }, []);
+
+      useEffect(() => {
+        localStorage.setItem('taskTimes', JSON.stringify(taskTimes));
+      }, [taskTimes]);
+
+      useEffect(() => {
+        if (currentTask) {
+          const interval = setInterval(() => {
+            setCurrentTime(Date.now());
+          }, 1000);
+          return () => clearInterval(interval);
+        }
+      }, [currentTask]);
+
+      const startTimer = (task) => {
+        if (currentTask) {
+          stopTimer(currentTask);
+        }
+        setCurrentTask(task);
+        setStartTime(Date.now());
+      };
+
+      const stopTimer = (task) => {
+        if (!startTime) return;
+
+        const elapsed = Date.now() - startTime;
+        const today = new Date().toISOString().slice(0, 10);
+        const taskKey = `${task}_${today}`;
+
+        setTaskTimes((prev) => {
+          const previousTime = prev[taskKey]?.totalTime || 0;
+          const newEntry = {
+            totalTime: previousTime + elapsed,
+            lastStart: new Date(startTime).toLocaleTimeString(),
+            lastEnd: new Date().toLocaleTimeString(),
+          };
+          return { ...prev, [taskKey]: newEntry };
+        });
+
+        setStartTime(null);
+      };
+
+      const handleTaskClick = (task) => {
+        if (currentTask === task) {
+          stopTimer(task);
+          setCurrentTask(null);
+        } else {
+          startTimer(task);
+        }
+      };
+
+      const formatTime = (ms) => {
+        const seconds = Math.floor(ms / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+        return `${hours}h ${minutes % 60}m ${seconds % 60}s`;
+      };
+
+      const today = new Date().toISOString().slice(0, 10);
+
+      return React.createElement(
+        'div',
+        { style: { padding: '20px', fontFamily: 'Arial, sans-serif' } },
+        React.createElement('h1', null, 'Time Tracker'),
+        React.createElement(
+          'div',
+          { style: { display: 'flex', gap: '10px' } },
+          tasks.map((task) => {
+            const taskKey = `${task}_${today}`;
+            const totalTime = taskTimes[taskKey]?.totalTime || 0;
+            const elapsedTime = currentTask === task && startTime ? currentTime - startTime : 0;
+            return React.createElement(
+              'button',
+              {
+                key: task,
+                onClick: () => handleTaskClick(task),
+                style: {
+                  padding: '10px 20px',
+                  backgroundColor: currentTask === task ? 'green' : 'gray',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '5px',
+                  cursor: 'pointer',
+                },
+              },
+              `${task} (${formatTime(totalTime + elapsedTime)})`
+            );
+          })
+        ),
+        currentTask && React.createElement('div', { style: { marginTop: '20px' } }, React.createElement('p', null, `Tracking: ${currentTask}`))
+      );
+    };
+
+    ReactDOM.render(React.createElement(TimeTracker), document.getElementById('root'));
+  </script>
+</body>
+</html>
