@@ -42,7 +42,9 @@
           stopTimer(currentTask);
         }
         setCurrentTask(task);
-        setStartTime(Date.now());
+        let date = new Date();
+        setStartTime(date);
+        setCurrentTime(date);
       };
 
       const stopTimer = (task) => {
