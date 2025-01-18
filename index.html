@@ -121,8 +121,8 @@
                 },
               },
               React.createElement('div', null, task),
-              React.createElement('div', { style: { fontSize: '0.9em', marginTop: '5px' } }, `Total: ${formatTime(totalTime)}`),
-              currentSessionTime && React.createElement('div', { style: { fontSize: '0.9em' } }, `Current: ${currentSessionTime}`)
+              React.createElement('div', { style: { fontSize: '1.2em', marginTop: '5px' } }, `⏱️: ${formatTime(totalTime)}`),
+              currentSessionTime && React.createElement('div', { style: { fontSize: '1.2em', color: 'yellow' } }, `🔥: ${currentSessionTime}`)
             );
           })
         ),
