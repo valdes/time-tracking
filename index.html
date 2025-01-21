@@ -60,13 +60,13 @@
           const sessionLog = prev[taskKey]?.sessions || [];
           const newEntry = {
             totalTime: previousTime + elapsed,
-            lastStart: new Date(startTime).toLocaleTimeString(),
-            lastEnd: new Date().toLocaleTimeString(),
+            lastStart: new Date(startTime).toLocaleString(),
+            lastEnd: new Date().toLocaleString(),
             sessions: [
               ...sessionLog,
               {
-                start: new Date(startTime).toLocaleTimeString(),
-                end: new Date().toLocaleTimeString(),
+                start: new Date(startTime).toISOString(),
+                end: new Date().toISOString(),
               },
             ],
           };
@@ -126,6 +126,28 @@
               );
             })}
           </div>
+          {Object.keys(taskTimes).map((taskKey) => {
+            const [taskName, date] = taskKey.split('_');
+            if (date !== today) return null;
+            const sessions = taskTimes[taskKey]?.sessions || [];
+            return (
+              <div key={taskKey} style={{ marginTop: '20px' }}>
+                <h3>{taskName} - {date}</h3>
+                <ul>
+                  {sessions.map((session, index) => {
+                    const start = new Date(session.start);
+                    const end = new Date(session.end);
+                    const length = end - start;
+                    return (
+                      <li key={index}>
+                        Start: {start.toLocaleString()}, End: {end.toLocaleString()}, Length: {formatTime(length)}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            );
+          })}
           {currentTask && (
             <div style={{ marginTop: '20px' }}>
               <p>Tracking: {currentTask}</p>
