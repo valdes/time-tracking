@@ -126,29 +126,26 @@
               );
             })}
           </div>
-          {Object.keys(taskTimes).map((taskKey) => {
+            {Object.keys(taskTimes).map((taskKey) => {
             const [taskName, date] = taskKey.split('_');
             if (date !== today) return null;
             const sessions = (taskTimes[taskKey]?.sessions || []).sort((a, b) => new Date(b.start) - new Date(a.start));
-            return (
-              <div key={taskKey} style={{ marginTop: '20px' }}>
-                <h3>{taskName} - {date}</h3>
+            return sessions.map((session, index) => {
+              const start = new Date(session.start);
+              const end = new Date(session.end);
+              const length = end - start;
+              return (
+              <div key={`${taskKey}_${index}`} style={{ marginTop: '20px' }}>
                 <ul style={{ listStyleType: 'none', padding: 0 }}>
-                  {sessions.map((session, index) => {
-                    const start = new Date(session.start);
-                    const end = new Date(session.end);
-                    const length = end - start;
-                    return (
-                      <li key={index} style={{ marginBottom: '5px', padding: '5px', border: '1px solid #ccc', borderRadius: '5px' }}>
-                        <span style={{ fontWeight: 'bold' }}>{formatTime(length)}</span> 
-                        <span style={{ color: '#555' }}>({start.toLocaleTimeString()} - {end.toLocaleTimeString()})</span>
-                      </li>
-                    );
-                  })}
+                <li style={{ marginBottom: '5px', padding: '5px', border: '1px solid #ccc', borderRadius: '5px' }}>
+                  <span style={{ fontWeight: 'bold' }}>{taskName}: {formatTime(length)}</span> 
+                  <span style={{ color: '#555' }}>({start.toLocaleTimeString()} - {end.toLocaleTimeString()})</span>
+                </li>
                 </ul>
               </div>
-            );
-          })}
+              );
+            });
+            })}
           {currentTask && (
             <div style={{ marginTop: '20px' }}>
               <p>Tracking: {currentTask}</p>
