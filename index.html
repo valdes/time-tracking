@@ -129,7 +129,7 @@
           {Object.keys(taskTimes).map((taskKey) => {
             const [taskName, date] = taskKey.split('_');
             if (date !== today) return null;
-            const sessions = taskTimes[taskKey]?.sessions || [];
+            const sessions = (taskTimes[taskKey]?.sessions || []).sort((a, b) => new Date(b.start) - new Date(a.start));
             return (
               <div key={taskKey} style={{ marginTop: '20px' }}>
                 <h3>{taskName} - {date}</h3>
