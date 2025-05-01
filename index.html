@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Time Tracker</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Time Tracker">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <meta name="msapplication-TileImage" content="/icons/android-chrome-192x192.png">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <link rel="icon" href="/icons/favicon.ico" type="image/x-icon">
   <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -156,6 +165,17 @@
     };
 
     ReactDOM.render(<TimeTracker />, document.getElementById('root'));
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js').then(registration => {
+          console.log('ServiceWorker registered: ', registration);
+        }).catch(registrationError => {
+          console.log('ServiceWorker registration failed: ', registrationError);
+        });
+      });
+    }
   </script>
 </body>
 </html>
