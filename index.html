@@ -22,6 +22,66 @@
   <script type="text/babel">
     const { useState, useEffect } = React;
 
+    const TodayHistory = ({ taskTimes, taskColors }) => {
+      const allSessions = Object.keys(taskTimes).flatMap((taskKey) => {
+        const [taskName, date] = taskKey.split('_');
+        const sessions = taskTimes[taskKey]?.sessions || [];
+        return sessions.map((session) => ({
+          taskName,
+          start: new Date(session.start),
+          end: new Date(session.end),
+          color: taskColors[taskName],
+        }));
+      }).sort((a, b) => a.start - b.start);
+
+      if (allSessions.length === 0) return <p>No tasks completed today.</p>;
+
+      const firstTaskTime = allSessions[0].start;
+      const lastTaskTime = allSessions[allSessions.length - 1].end;
+      const firstHour = firstTaskTime.getHours();
+      const lastHour = lastTaskTime.getHours() + 1;
+
+      return (
+        <div style={{ display: 'flex', position: 'relative', border: '1px solid #ccc', borderRadius: '5px', height: '600px', overflow: 'hidden', marginTop: '20px' }}>
+          <div style={{ width: '50px', borderRight: '1px solid #ccc', textAlign: 'right', paddingRight: '5px', boxSizing: 'border-box' }}>
+            {[...Array(lastHour - firstHour).keys()].map((hour) => (
+              <div key={hour} style={{ height: `${100 / (lastHour - firstHour)}%`, borderBottom: '1px dotted #ccc', boxSizing: 'border-box' }}>
+                {hour + firstHour}:00
+              </div>
+            ))}
+          </div>
+          <div style={{ flex: 1, position: 'relative' }}>
+            {allSessions.map((session, index) => {
+              const startOffset = (session.start.getHours() * 60 + session.start.getMinutes()) - (firstHour * 60);
+              const endOffset = (session.end.getHours() * 60 + session.end.getMinutes()) - (firstHour * 60);
+              const top = (startOffset / ((lastHour - firstHour) * 60)) * 100;
+              const height = ((endOffset - startOffset) / ((lastHour - firstHour) * 60)) * 100;
+              return (
+                <div
+                  key={index}
+                  style={{
+                    position: 'absolute',
+                    top: `${top}%`,
+                    height: `${height}%`,
+                    left: '0',
+                    right: '0',
+                    backgroundColor: session.color,
+                    color: 'white',
+                    padding: '5px',
+                    boxSizing: 'border-box',
+                    border: '1px solid #000',
+                  }}
+                >
+                  <div>{session.taskName}</div>
+                  <div>{session.start.toLocaleTimeString()} - {session.end.toLocaleTimeString()}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    };
+
     const TimeTracker = () => {
       const tasks = ['Work', 'Startup', 'Fitness', 'Leisure', 'Other'];
       const taskColors = {
@@ -142,7 +202,8 @@
               );
             })}
           </div>
-            {Object.keys(taskTimes).map((taskKey) => {
+          <TodayHistory taskTimes={taskTimes} taskColors={taskColors} />
+          {Object.keys(taskTimes).map((taskKey) => {
             const [taskName, date] = taskKey.split('_');
             if (date !== today) return null;
             const sessions = (taskTimes[taskKey]?.sessions || []).sort((a, b) => new Date(b.start) - new Date(a.start));
