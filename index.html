@@ -24,6 +24,13 @@
 
     const TimeTracker = () => {
       const tasks = ['Work', 'Startup', 'Fitness', 'Leisure', 'Other'];
+      const taskColors = {
+        Work: '#4caf50',
+        Startup: '#2196f3',
+        Fitness: '#ff9800',
+        Leisure: '#9c27b0',
+        Other: '#f44336',
+      };
       const [currentTask, setCurrentTask] = useState(null);
       const [taskTimes, setTaskTimes] = useState({});
       const [startTime, setStartTime] = useState(null);
@@ -118,7 +125,7 @@
                   onClick={() => handleTaskClick(task)}
                   style={{
                     padding: '10px 20px',
-                    backgroundColor: currentTask === task ? 'green' : 'gray',
+                    backgroundColor: currentTask === task ? '#9acd32' : taskColors[task],
                     color: 'white',
                     border: 'none',
                     borderRadius: '5px',
