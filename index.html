@@ -22,13 +22,11 @@
   <script type="text/babel">
     const { useState, useEffect } = React;
 
-    const TodayHistory = ({ taskTimes, taskColors }) => {
-      function isToday(date) {
-        
-        const today = new Date();
-        return date.getDate() === today.getDate() &&
-              date.getMonth() === today.getMonth() &&
-              date.getFullYear() === today.getFullYear();
+    const TodayHistory = ({ taskTimes, taskColors, filterDate }) => {
+      function isToday(date, filterDate) {
+        return date.getDate() === filterDate.getDate() &&
+              date.getMonth() === filterDate.getMonth() &&
+              date.getFullYear() === filterDate.getFullYear();
       }
 
 
@@ -41,7 +39,7 @@
           end: new Date(session.end),
           color: taskColors[taskName],
         }));
-      }).filter(task => isToday(task.start)).sort((a, b) => a.start - b.start);
+      }).filter(task => isToday(task.start, filterDate)).sort((a, b) => a.start - b.start);
 
       if (allSessions.length === 0) return <p>No tasks completed today.</p>;
 
@@ -211,7 +209,7 @@
               );
             })}
           </div>
-          <TodayHistory taskTimes={taskTimes} taskColors={taskColors} />
+          <TodayHistory taskTimes={taskTimes} taskColors={taskColors} filterDate={new Date()} />
           {Object.keys(taskTimes).map((taskKey) => {
             const [taskName, date] = taskKey.split('_');
             if (date !== today) return null;
