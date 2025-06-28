@@ -89,18 +89,20 @@
     };
 
     const TimeTracker = () => {
-      const tasks = ['Work', 'Startup', 'Fitness', 'Leisure', 'Other'];
-      const taskColors = {
+      const [tasks, setTasks] = useState(['Work', 'Startup', 'Fitness', 'Leisure', 'Other']);
+      const [taskColors, setTaskColors] = useState({
         Work: '#4caf50',
         Startup: '#2196f3',
         Fitness: '#ff9800',
         Leisure: '#9c27b0',
         Other: '#f44336',
-      };
+      });
       const [currentTask, setCurrentTask] = useState(null);
       const [taskTimes, setTaskTimes] = useState({});
       const [startTime, setStartTime] = useState(null);
       const [currentTime, setCurrentTime] = useState(Date.now());
+      const [editingTaskIdx, setEditingTaskIdx] = useState(null);
+      const [editingTaskValue, setEditingTaskValue] = useState('');
 
       useEffect(() => {
         const storedTimes = JSON.parse(localStorage.getItem('taskTimes')) || {};
@@ -176,34 +178,110 @@
 
       const today = new Date().toISOString().slice(0, 10);
 
+      const changeTaskText = (idx, newTask) => {
+        const newTasks = [...tasks];
+        const oldTask = tasks[idx];
+        newTasks[idx] = newTask;
+        setTasks(newTasks);
+
+        // Update color mapping: keep color for renamed task, remove old key if changed
+        if (newTask !== oldTask) {
+          setTaskColors(prev => {
+            const updated = { ...prev };
+            updated[newTask] = prev[oldTask] || '#cccccc';
+            if (oldTask !== newTask) delete updated[oldTask];
+            return updated;
+          });
+        }
+        setEditingTaskIdx(null);
+      }
+
       return (
         <div style={{ padding: '10px', fontFamily: 'Arial, sans-serif', height: '100%', display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', flexShrink: 0 }}>
-            {tasks.map((task) => {
+            {tasks.map((task, idx) => {
               const taskKey = `${task}_${today}`;
               const totalTime = taskTimes[taskKey]?.totalTime || 0;
               const elapsedTime = currentTask === task && startTime ? currentTime - startTime : 0;
               const currentSessionTime = currentTask === task && startTime ? formatTime(elapsedTime) : null;
+              const isEditing = editingTaskIdx === idx;
               return (
-                <button
-                  key={task}
-                  onClick={() => handleTaskClick(task)}
-                  style={{
-                    padding: '10px 20px',
-                    backgroundColor: currentTask === task ? '#9acd32' : taskColors[task],
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                  }}
-                >
-                  <div>{task}</div>
-                  <div style={{ fontSize: '1.2em', marginTop: '5px' }}>⏱️: {formatTime(totalTime)}</div>
-                  {currentSessionTime && (
-                    <div style={{ fontSize: '1.2em', color: 'yellow' }}>🔥 Active: {currentSessionTime}</div>
-                  )}
-                </button>
+                <div key={task} style={{ position: 'relative', display: 'flex', alignItems: 'center', backgroundColor: taskColors[task], borderRadius: '5px' }}>
+                  <button
+                    onClick={() => handleTaskClick(task)}
+                    style={{
+                      flex: 1,
+                      padding: '10px 20px',
+                      backgroundColor: currentTask === task ? '#9acd32' : taskColors[task],
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '5px',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'flex-start',
+                      marginRight: '40px'
+                    }}
+                    disabled={isEditing}
+                  >
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={editingTaskValue}
+                        autoFocus
+                        onChange={e => setEditingTaskValue(e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') {
+                            changeTaskText(idx, editingTaskValue.trim() || oldTask);   
+                          }
+                        }}
+                        style={{
+                          fontSize: '1em',
+                          padding: '2px 6px',
+                          borderRadius: '3px',
+                          border: '1px solid #ccc',
+                          width: '80%',
+                          marginBottom: '4px'
+                        }}
+                      />
+                    ) : (
+                      <div>{task}</div>
+                    )}
+                    <div style={{ fontSize: '1.2em', marginTop: '5px' }}>⏱️: {formatTime(totalTime)}</div>
+                    {currentSessionTime && (
+                      <div style={{ fontSize: '1.2em', color: 'yellow' }}>🔥 Active: {currentSessionTime}</div>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (isEditing) {
+                        changeTaskText(idx, editingTaskValue.trim() || oldTask);
+                      } else {
+                        setEditingTaskIdx(idx);
+                        setEditingTaskValue(task);
+                      }
+                    }}
+                    style={{
+                      position: 'absolute',
+                      right: 0,
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '8px',
+                      fontSize: '1.2em',
+                      color: isEditing ? '#4caf50' : '#333'
+                    }}
+                    tabIndex={-1}
+                    aria-label={isEditing ? "Save" : "Edit"}
+                  >
+                    {isEditing ? (
+                      <span>&#10003;</span> // check icon
+                    ) : (
+                      <span>&#9998;</span> // pencil icon
+                    )}
+                  </button>
+                </div>
               );
             })}
           </div>
