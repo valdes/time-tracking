@@ -260,7 +260,7 @@
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: 'flex-start',
-                      marginRight: '40px'
+                      marginRight: '80px' // increased for two buttons
                     }}
                     disabled={isEditing}
                   >
@@ -291,7 +291,8 @@
                     {currentSessionTime && (
                       <div style={{ fontSize: '1.2em', color: 'yellow' }}>🔥 Active: {currentSessionTime}</div>
                     )}
-                  </button>
+                  </button>                
+                  {/* Edit button */}
                   <button
                     onClick={() => {
                       if (isEditing) {
@@ -303,7 +304,7 @@
                     }}
                     style={{
                       position: 'absolute',
-                      right: 0,
+                      right: 40,
                       background: 'none',
                       border: 'none',
                       cursor: 'pointer',
@@ -319,6 +320,33 @@
                     ) : (
                       <span>&#9998;</span> // pencil icon
                     )}
+                  </button>
+                  {/* Remove button */}
+                  <button
+                    onClick={() => {
+                      const newTasks = tasks.filter((_, i) => i !== idx);
+                      setTasks(newTasks);
+                      setTaskColors(prev => {
+                        const updated = { ...prev };
+                        delete updated[task];
+                        return updated;
+                      });
+                      if (editingTaskIdx === idx) setEditingTaskIdx(null);
+                    }}
+                    style={{
+                      position: 'absolute',
+                      right: '0px',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '8px',
+                      fontSize: '1.2em',
+                      color: '#333'
+                    }}
+                    tabIndex={-1}
+                    aria-label="Remove"
+                  >
+                    <span>&#128465;</span> {/* trash icon */}
                   </button>
                 </div>
               );
