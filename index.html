@@ -88,6 +88,14 @@
       );
     };
 
+    const getRandomColor = () => {
+      const colors = [
+        '#e57373', '#f06292', '#ba68c8', '#64b5f6', '#4dd0e1',
+        '#81c784', '#ffd54f', '#ffb74d', '#a1887f', '#90a4ae'
+      ];
+      return colors[Math.floor(Math.random() * colors.length)];
+    };
+
     const TimeTracker = () => {
       const [tasks, setTasks] = useState(['Work', 'Startup', 'Fitness', 'Leisure', 'Other']);
       const [taskColors, setTaskColors] = useState({
@@ -196,8 +204,39 @@
         setEditingTaskIdx(null);
       }
 
+      const addTask = () => {
+        let baseName = "New";
+        let name = baseName;
+        let i = 1;
+        while (tasks.includes(name)) {
+          name = `${baseName} ${i++}`;
+        }
+        setTasks([...tasks, name]);
+        setTaskColors(prev => ({ ...prev, [name]: getRandomColor() }));
+      };
+
       return (
         <div style={{ padding: '10px', fontFamily: 'Arial, sans-serif', height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '10px' }}>
+            <button
+              onClick={addTask}
+              style={{
+                background: '#2196f3',
+                color: 'white',
+                border: 'none',
+                borderRadius: '50%',
+                width: '48px',
+                height: '48px',
+                fontSize: '2em',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+                cursor: 'pointer'
+              }}
+              aria-label="Add Task"
+            >+</button>
+          </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', flexShrink: 0 }}>
             {tasks.map((task, idx) => {
               const taskKey = `${task}_${today}`;
