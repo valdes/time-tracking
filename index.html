@@ -205,7 +205,6 @@
           setTaskColors(prev => {
             const updated = { ...prev };
             updated[newTask] = prev[oldTask] || '#cccccc';
-            if (oldTask !== newTask) delete updated[oldTask];
             return updated;
           });
         }
@@ -334,11 +333,6 @@
                     onClick={() => {
                       const newTasks = tasks.filter((_, i) => i !== idx);
                       setTasks(newTasks);
-                      setTaskColors(prev => {
-                        const updated = { ...prev };
-                        delete updated[task];
-                        return updated;
-                      });
                       if (editingTaskIdx === idx) setEditingTaskIdx(null);
                     }}
                     style={{
