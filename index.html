@@ -97,8 +97,8 @@
     };
 
     const TimeTracker = () => {
-      const [tasks, setTasks] = useState(['Work', 'Startup', 'Fitness', 'Leisure', 'Other']);
-      const [taskColors, setTaskColors] = useState({
+      const [tasks, setTasks] = useState(() => JSON.parse(localStorage.getItem('tasks')) || ['Work', 'Startup', 'Fitness', 'Leisure', 'Other']);
+      const [taskColors, setTaskColors] = useState(() => JSON.parse(localStorage.getItem('taskColors')) || {
         Work: '#4caf50',
         Startup: '#2196f3',
         Fitness: '#ff9800',
@@ -116,6 +116,14 @@
         const storedTimes = JSON.parse(localStorage.getItem('taskTimes')) || {};
         setTaskTimes(storedTimes);
       }, []);
+
+      useEffect(() => {
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+      }, [tasks]);
+
+      useEffect(() => {
+        localStorage.setItem('taskColors', JSON.stringify(taskColors));
+      }, [taskColors]);
 
       useEffect(() => {
         localStorage.setItem('taskTimes', JSON.stringify(taskTimes));
