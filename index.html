@@ -252,13 +252,13 @@
               const currentSessionTime = currentTask === task && startTime ? formatTime(elapsedTime) : null;
               const isEditing = editingTaskIdx === idx;
               return (
-                <div key={task} style={{ position: 'relative', display: 'flex', alignItems: 'center', backgroundColor: taskColors[task], borderRadius: '5px' }}>
+                <div key={task} style={{ position: 'relative', display: 'flex', alignItems: 'center', backgroundColor: currentTask === task ? '#9acd32' : taskColors[task], borderRadius: '5px' }}>
                   <button
                     onClick={() => handleTaskClick(task)}
                     style={{
                       flex: 1,
                       padding: '10px 20px',
-                      backgroundColor: currentTask === task ? '#9acd32' : taskColors[task],
+                      background: 'none',
                       color: 'white',
                       border: 'none',
                       borderRadius: '5px',
