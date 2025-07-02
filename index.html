@@ -99,9 +99,19 @@
         Leisure: '#9c27b0',
         Other: '#f44336',
       });
-      const [currentTask, setCurrentTask] = useState(null);
+
+      // currentTask: { name: string, startTime: string (ISO) }
+      const [currentTask, setCurrentTask] = useState(() => {
+        const stored = localStorage.getItem('currentTask');
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored);
+            if (parsed && typeof parsed === 'object' && parsed.name) return parsed;
+          } catch {}
+        }
+        return null;
+      });
       const [taskTimes, setTaskTimes] = useState({});
-      const [startTime, setStartTime] = useState(null);
       const [currentTime, setCurrentTime] = useState(Date.now());
       const [editingTaskIdx, setEditingTaskIdx] = useState(null);
       const [editingTaskValue, setEditingTaskValue] = useState('');
@@ -134,18 +144,18 @@
 
       const startTimer = (task) => {
         if (currentTask) {
-          stopTimer(currentTask);
+          stopTimer(currentTask.name);
         }
-        setCurrentTask(task);
-        let date = new Date();
-        setStartTime(date);
-        setCurrentTime(date);
+        const now = new Date();
+        setCurrentTask({ name: task, startTime: now.toISOString() });
+        setCurrentTime(now);
       };
 
       const stopTimer = (task) => {
-        if (!startTime) return;
+        if (!currentTask || !currentTask.startTime) return;
 
-        const elapsed = Date.now() - startTime;
+        const startTime = new Date(currentTask.startTime);
+        const elapsed = Date.now() - startTime.getTime();
         const today = new Date().toISOString().slice(0, 10);
 
         setTaskTimes((prev) => {
@@ -155,12 +165,12 @@
           const sessionLog = todayTasks[task]?.sessions || [];
           const newTaskEntry = {
             totalTime: previousTaskTime + elapsed,
-            lastStart: new Date(startTime).toLocaleString(),
+            lastStart: startTime.toLocaleString(),
             lastEnd: new Date().toLocaleString(),
             sessions: [
               ...sessionLog,
               {
-                start: new Date(startTime).toISOString(),
+                start: startTime.toISOString(),
                 end: new Date().toISOString(),
               },
             ],
@@ -175,13 +185,12 @@
           return { ...prev, [today]: newEntry };
         });
 
-        setStartTime(null);
+        setCurrentTask(null);
       };
 
       const handleTaskClick = (task) => {
-        if (currentTask === task) {
+        if (currentTask && currentTask.name === task) {
           stopTimer(task);
-          setCurrentTask(null);
         } else {
           startTimer(task);
         }
@@ -224,6 +233,10 @@
         setTaskColors(prev => ({ ...prev, [name]: getRandomColor() }));
       };
 
+      useEffect(() => {
+        localStorage.setItem('currentTask', currentTask ? JSON.stringify(currentTask) : '');
+      }, [currentTask]);
+
       return (
         <div style={{ padding: '10px', fontFamily: 'Arial, sans-serif', height: '100%', display: 'flex', flexDirection: 'column' }}>
           <div style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '10px' }}>
@@ -251,11 +264,15 @@
               const today = new Date().toISOString().slice(0, 10);
               const todayTasks = taskTimes[today] || {};
               const totalTime = todayTasks[task]?.totalTime || 0;
-              const elapsedTime = currentTask === task && startTime ? currentTime - startTime : 0;
-              const currentSessionTime = currentTask === task && startTime ? formatTime(elapsedTime) : null;
+              const elapsedTime = currentTask && currentTask.name === task && currentTask.startTime
+                ? currentTime - new Date(currentTask.startTime).getTime()
+                : 0;
+              const currentSessionTime = currentTask && currentTask.name === task && currentTask.startTime
+                ? formatTime(elapsedTime)
+                : null;
               const isEditing = editingTaskIdx === idx;
               return (
-                <div key={task} style={{ position: 'relative', display: 'flex', alignItems: 'center', backgroundColor: currentTask === task ? '#9acd32' : taskColors[task], borderRadius: '5px' }}>
+                <div key={task} style={{ position: 'relative', display: 'flex', alignItems: 'center', backgroundColor: currentTask && currentTask.name === task ? '#9acd32' : taskColors[task], borderRadius: '5px' }}>
                   <button
                     onClick={() => handleTaskClick(task)}
                     style={{
@@ -270,7 +287,7 @@
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: 'flex-start',
-                      marginRight: '80px' // increased for two buttons
+                      marginRight: '80px'
                     }}
                     disabled={isEditing}
                   >
