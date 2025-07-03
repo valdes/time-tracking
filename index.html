@@ -314,7 +314,7 @@
                     ) : (
                       <div>{task}</div>
                     )}
-                    <div style={{ fontSize: '1.2em', marginTop: '5px' }}>⏱️: {formatTime(totalTime)}</div>
+                    <div style={{ fontSize: '1.2em', marginTop: '5px' }}>⏱️: {formatTime(totalTime + elapsedTime)}</div>
                     {currentSessionTime && (
                       <div style={{ fontSize: '1.2em', color: 'yellow' }}>🔥 Active: {currentSessionTime}</div>
                     )}
