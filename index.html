@@ -24,8 +24,9 @@
 
     const TodayHistory = ({ taskTimes, taskColors, filterDate }) => {
       const today = new Date().toISOString().slice(0, 10);
-      const allSessions = Object.keys(taskTimes[today] || []).flatMap((taskName) => {
-        const sessions = taskTimes[today][taskName]?.sessions || [];
+      const date = filterDate ? filterDate.toISOString().slice(0, 10) : today;
+      const allSessions = Object.keys(taskTimes[date] || []).flatMap((taskName) => {
+        const sessions = taskTimes[date][taskName]?.sessions || [];
         return sessions.map((session) => ({
           taskName,
           start: new Date(session.start),
@@ -115,6 +116,10 @@
       const [currentTime, setCurrentTime] = useState(Date.now());
       const [editingTaskIdx, setEditingTaskIdx] = useState(null);
       const [editingTaskValue, setEditingTaskValue] = useState('');
+      const [displayDate, setDisplayDate] = useState(() => {
+        const d = new Date();
+        return d;
+      });
 
       useEffect(() => {
         const storedTimes = JSON.parse(localStorage.getItem('taskTimes')) || {};
@@ -237,6 +242,32 @@
         localStorage.setItem('currentTask', currentTask ? JSON.stringify(currentTask) : '');
       }, [currentTask]);
 
+      const goToPreviousDay = () => {
+        setDisplayDate(prev => {
+          const d = new Date(prev);
+          d.setDate(d.getDate() - 1);
+          return d;
+        });
+      };
+
+      const goToNextDay = () => {
+        setDisplayDate(prev => {
+          const d = new Date(prev);
+          d.setDate(d.getDate() + 1);
+          return d;
+        });
+      };
+
+      const goToToday = () => {
+        const d = new Date();
+        setDisplayDate(d);
+      };
+
+      const displayDateString = displayDate.toLocaleDateString(undefined, {
+        month: 'long',
+        day: 'numeric'
+      });
+
       return (
         <div style={{ padding: '10px', fontFamily: 'Arial, sans-serif', height: '100%', display: 'flex', flexDirection: 'column' }}>
           <div style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '10px' }}>
@@ -258,7 +289,7 @@
               }}
               aria-label="Add Task"
             >+</button>
-          </div>
+          </div>          
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', flexShrink: 0 }}>
             {tasks.map((task, idx) => {
               const today = new Date().toISOString().slice(0, 10);
@@ -374,7 +405,59 @@
               );
             })}
           </div>
-          <TodayHistory taskTimes={taskTimes} taskColors={taskColors} filterDate={new Date()} />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '10px 0' }}>
+            <button
+              onClick={goToPreviousDay}
+              style={{
+                fontSize: '1.5em',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                marginRight: '10px',
+                color: '#2196f3'
+              }}
+              aria-label="Previous Day"
+            >
+              &lt;
+            </button>
+            <span style={{ fontSize: '1.1em', fontWeight: 'bold', marginRight: '10px' }}>
+              {displayDateString}
+            </span>
+            <button
+              onClick={goToToday}
+              style={{
+                fontSize: '1em',
+                background: '#2196f3',
+                color: 'white',
+                border: 'none',
+                borderRadius: '5px',
+                padding: '4px 12px',
+                cursor: 'pointer'
+              }}
+            >
+              Today
+            </button>
+            <button
+              onClick={goToNextDay}
+              style={{
+              fontSize: '1.5em',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              marginLeft: '10px',
+              color: '#2196f3'
+              }}
+              aria-label="Next Day"
+              disabled={displayDate.toDateString() === new Date().toDateString() || displayDate > new Date()}
+            >
+              &gt;
+            </button>
+          </div>
+          <TodayHistory
+            taskTimes={taskTimes}
+            taskColors={taskColors}
+            filterDate={displayDate}
+          />
         </div>
       );
     };
