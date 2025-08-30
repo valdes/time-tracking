@@ -73,6 +73,9 @@ const LastMeal = () => {
 
   return (
     <div>
+      <div style={{textAlign: 'center', margin: '20px'}}>
+        <h2>⏱️: {elapsed}</h2>
+      </div>
       <button
         style={{
           padding: '10px',
@@ -83,7 +86,7 @@ const LastMeal = () => {
         }}
         onClick={handleClick}
       >
-        {lastMealTime ? `Last meal: ${elapsed}` : 'Last Meal'}
+        Log Meal
       </button>
       <div style={{marginTop: '20px'}}>
         <strong>Today's meals:</strong>
