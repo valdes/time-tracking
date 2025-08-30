@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Time Tracker</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Time Tracker">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="msapplication-TileImage" content="/icons/icon-192x192.png">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
+  <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+  <div id="root" style="height: calc(100vh - 55px); display: flex; flex-direction: column;"></div>
+  <footer style="text-align: center; padding: 10px; font-size: 0.8em; color: #666;">
+    <a href="index.html">Time tracker</a> | Last meal
+  </footer>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+const getToday = () => {
+  const d = new Date();
+  return d.toISOString().slice(0, 10); // YYYY-MM-DD
+};
+
+const getMeals = () => {
+  const saved = localStorage.getItem('mealsByDay');
+  return saved ? JSON.parse(saved) : {};
+};
+
+const saveMeals = (meals) => {
+  localStorage.setItem('mealsByDay', JSON.stringify(meals));
+};
+
+const LastMeal = () => {
+  const [mealsByDay, setMealsByDay] = useState(getMeals());
+  const today = getToday();
+  const todayMeals = mealsByDay[today] || [];
+  const lastMealTime = todayMeals.length ? todayMeals[todayMeals.length - 1] : null;
+  const [elapsed, setElapsed] = useState('');
+
+  useEffect(() => {
+    const updateElapsed = () => {
+      if (lastMealTime) {
+        const diff = Math.floor((Date.now() - lastMealTime) / 1000);
+        const hours = Math.floor(diff / 3600);
+        const minutes = Math.floor((diff % 3600) / 60);
+        const seconds = diff % 60;
+        setElapsed(`${hours}h ${minutes}m ${seconds}s`);
+      } else {
+        setElapsed('No meal recorded today');
+      }
+    };
+    updateElapsed();
+    const interval = setInterval(updateElapsed, 1000);
+    return () => clearInterval(interval);
+  }, [lastMealTime]);
+
+  const handleClick = () => {
+    const now = Date.now();
+    const updatedMeals = { ...mealsByDay };
+    updatedMeals[today] = [...(updatedMeals[today] || []), now];
+    setMealsByDay(updatedMeals);
+    saveMeals(updatedMeals);
+  };
+
+  return (
+    <div>
+      <button
+        style={{
+          padding: '10px',
+          backgroundColor: '#28a745',
+          color: '#fff',
+          border: 'none',
+          cursor: 'pointer'
+        }}
+        onClick={handleClick}
+      >
+        {lastMealTime ? `Last meal: ${elapsed}` : 'Last Meal'}
+      </button>
+      <div style={{marginTop: '20px'}}>
+        <strong>Today's meals:</strong>
+        <ul>
+          {todayMeals.map((meal, idx) => (
+            <li key={meal}>
+              {new Date(meal).toLocaleTimeString()}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+};
+
+    ReactDOM.render(<LastMeal />, document.getElementById('root'));
+  </script>
+</body>
+</html>
