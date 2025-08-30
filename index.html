@@ -18,7 +18,10 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
 <body>
-  <div id="root" style="height: 100vh; display: flex; flex-direction: column;"></div>
+  <div id="root" style="height: calc(100vh - 55px); display: flex; flex-direction: column;"></div>
+  <footer style="text-align: center; padding: 10px; font-size: 0.8em; color: #666;">
+    Time tracker | <a href="last-meal.html">Last meal</a>
+  </footer>
   <script type="text/babel">
     const { useState, useEffect } = React;
 
