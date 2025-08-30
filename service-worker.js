@@ -1,7 +1,8 @@
-const CACHE_NAME = 'time-tracker-cache-v1';
+const CACHE_NAME = 'time-tracker-cache-v2';
 const urlsToCache = [
   '/',
   '/index.html',
+  '/last-meal.html',
   '/manifest.json',
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png',
