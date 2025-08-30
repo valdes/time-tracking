@@ -64,9 +64,18 @@ const LastMeal = () => {
   }, [lastMealTime]);
 
   const addMeal = () => {
+    updateMeal('snack', true);
+  };
+
+  const updateMeal = (type, needUpdateElapsepTime) => {
     const now = Date.now();
     const updatedMeals = { ...mealsByDay };
-    updatedMeals[today] = [...(updatedMeals[today] || []), now];
+    if (type === 'snack') {
+      updatedMeals[today] = [...(updatedMeals[today] || []), now];
+    }
+    else {
+      updatedMeals[today][type] = now;
+    }
     setMealsByDay(updatedMeals);
     saveMeals(updatedMeals);
   };
