@@ -63,7 +63,7 @@ const LastMeal = () => {
     return () => clearInterval(interval);
   }, [lastMealTime]);
 
-  const handleClick = () => {
+  const addMeal = () => {
     const now = Date.now();
     const updatedMeals = { ...mealsByDay };
     updatedMeals[today] = [...(updatedMeals[today] || []), now];
@@ -84,7 +84,7 @@ const LastMeal = () => {
           border: 'none',
           cursor: 'pointer'
         }}
-        onClick={handleClick}
+        onClick={addMeal}
       >
         Log Meal
       </button>
