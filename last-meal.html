@@ -97,14 +97,14 @@ const LastMeal = () => {
   }, [lastMealTime]);
 
   const addSnack = () => {
-    updateMeal('snack', true);
+    addMeal('snack', true);
   };
 
   const addLunch = () => {
-    updateMeal('lunch', true);
+    addMeal('lunch', true);
   };
 
-  const updateMeal = (type, needUpdateElapsepTime) => {
+  const addMeal = (type, needUpdateElapsepTime) => {
     const now = Date.now();
     const updatedMeals = { ...meals };
     updatedMeals.mealsByDay[today] = [...(updatedMeals.mealsByDay[today] || []), { type: type, time: now}];
