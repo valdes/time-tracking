@@ -25,6 +25,32 @@
   <script type="text/babel">
     const { useState, useEffect } = React;
     const STORAGE_KEY = 'meals-tracker';
+    const CURRENT_DATA_VERSION = 1;
+    const MIGRATIONS = [
+      (data) => {
+        // Migration version 1: Convert mealsByDay values from array of timestamps to array of objects with type and time
+        console.log("Running migration 1 for object:", data);
+        
+        if (data.dataVersion != 1 || data.dataVersion != undefined) {
+          return;
+        }
+        data.dataVersion = 1;
+        let loggingDays =  Object.keys(data.mealsByDay);
+        console.log("Logging days:", loggingDays);
+        
+        for (let key in loggingDays) {
+          let day = loggingDays[key];
+          
+          data.mealsByDay[day] = [...data.mealsByDay[day].map((timestamp) => { return { type: 'custom', time: timestamp } })];
+        }
+      }
+    ];
+
+const applyMigrations = (data) => {
+  for (let i = 0; i < MIGRATIONS.length; i++) {
+    MIGRATIONS[i](data);
+  }
+};    
 
 const getToday = () => {
   const d = new Date();
@@ -33,7 +59,12 @@ const getToday = () => {
 
 const getMeals = () => {
   const saved = localStorage.getItem(STORAGE_KEY);
-  return saved ? JSON.parse(saved) : { lastMealTime: null, mealsByDay: {} };
+  if (!saved) {
+    return { lastMealTime: null, mealsByDay: {}, dataVersion: CURRENT_DATA_VERSION };
+  }
+  let data = JSON.parse(saved);
+  applyMigrations(data);
+  return data;
 };
 
 const saveMeals = (meals) => {
@@ -71,7 +102,7 @@ const LastMeal = () => {
   const updateMeal = (type, needUpdateElapsepTime) => {
     const now = Date.now();
     const updatedMeals = { ...meals };
-    updatedMeals.mealsByDay[today] = [...(updatedMeals.mealsByDay[today] || []), now];
+    updatedMeals.mealsByDay[today] = [...(updatedMeals.mealsByDay[today] || []), { type: type, time: now}];
     if (needUpdateElapsepTime) {
       updatedMeals.lastMealTime = now;
     }
@@ -100,8 +131,8 @@ const LastMeal = () => {
         <strong>Today's meals:</strong>
         <ul>
           {todayMeals.map((meal, idx) => (
-            <li key={meal}>
-              {new Date(meal).toLocaleTimeString()}
+            <li key={idx}>
+              {new Date(meal.time).toLocaleTimeString()}
             </li>
           ))}
         </ul>
