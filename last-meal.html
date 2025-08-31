@@ -27,6 +27,7 @@
     const STORAGE_KEY = 'meals-tracker';
     const LUNCH = 'lunch';
     const DINNER = 'dinner';
+    const SNACK = 'snack';
     const CURRENT_DATA_VERSION = 1;
     const MIGRATIONS = [
       (data) => {
@@ -98,11 +99,11 @@ const LastMeal = () => {
   }, [lastMealTime]);
 
   const addSnack = () => {
-    addMeal('snack', true);
+    addMeal(SNACK, true);
   };
 
   const addLunch = () => {
-    addMeal('lunch', true);
+    addMeal(LUNCH, true);
   };
 
   const addDinner = () => {
