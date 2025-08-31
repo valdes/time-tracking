@@ -31,19 +31,19 @@ const getToday = () => {
 };
 
 const getMeals = () => {
-  const saved = localStorage.getItem('mealsByDay');
-  return saved ? JSON.parse(saved) : {};
+  const saved = localStorage.getItem('meals-tracker');
+  return saved ? JSON.parse(saved) : { lastMealTime: null, mealsByDay: {} };
 };
 
 const saveMeals = (meals) => {
-  localStorage.setItem('mealsByDay', JSON.stringify(meals));
+  localStorage.setItem('meals-tracker', JSON.stringify(meals));
 };
 
 const LastMeal = () => {
-  const [mealsByDay, setMealsByDay] = useState(getMeals());
+  const [meals, setMeals] = useState(getMeals());
   const today = getToday();
-  const todayMeals = mealsByDay[today] || [];
-  const lastMealTime = todayMeals.length ? todayMeals[todayMeals.length - 1] : null;
+  const todayMeals = meals.mealsByDay[today] || [];
+  const lastMealTime = meals.lastMealTime;
   const [elapsed, setElapsed] = useState('');
 
   useEffect(() => {
@@ -69,14 +69,12 @@ const LastMeal = () => {
 
   const updateMeal = (type, needUpdateElapsepTime) => {
     const now = Date.now();
-    const updatedMeals = { ...mealsByDay };
-    if (type === 'snack') {
-      updatedMeals[today] = [...(updatedMeals[today] || []), now];
+    const updatedMeals = { ...meals };
+    updatedMeals.mealsByDay[today] = [...(updatedMeals.mealsByDay[today] || []), now];
+    if (needUpdateElapsepTime) {
+      updatedMeals.lastMealTime = now;
     }
-    else {
-      updatedMeals[today][type] = now;
-    }
-    setMealsByDay(updatedMeals);
+    setMeals(updatedMeals);
     saveMeals(updatedMeals);
   };
 
