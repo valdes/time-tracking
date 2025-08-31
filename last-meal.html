@@ -26,6 +26,7 @@
     const { useState, useEffect } = React;
     const STORAGE_KEY = 'meals-tracker';
     const LUNCH = 'lunch';
+    const DINNER = 'dinner';
     const CURRENT_DATA_VERSION = 1;
     const MIGRATIONS = [
       (data) => {
@@ -104,6 +105,10 @@ const LastMeal = () => {
     addMeal('lunch', true);
   };
 
+  const addDinner = () => {
+    addMeal(DINNER, true);
+  };
+
   const addMeal = (type, needUpdateElapsepTime) => {
     const now = Date.now();
     const updatedMeals = { ...meals };
@@ -149,6 +154,20 @@ const LastMeal = () => {
         disabled={isAlreadyLogMealToday(LUNCH)}
       >
         Lunch
+      </button>
+      <button
+        style={{
+          padding: '10px',
+          backgroundColor: isAlreadyLogMealToday(DINNER) ? '#6c757d' : '#28a745',
+          color: '#fff',
+          border: 'none',
+          cursor: 'pointer',
+          marginLeft: '10px'
+        }}
+        onClick={addDinner}
+        disabled={isAlreadyLogMealToday(DINNER)}
+      >
+        Dinner
       </button>
       <div style={{marginTop: '20px'}}>
         <strong>Today's meals:</strong>
