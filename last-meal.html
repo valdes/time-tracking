@@ -24,6 +24,7 @@
   </footer>
   <script type="text/babel">
     const { useState, useEffect } = React;
+    const STORAGE_KEY = 'meals-tracker';
 
 const getToday = () => {
   const d = new Date();
@@ -31,12 +32,12 @@ const getToday = () => {
 };
 
 const getMeals = () => {
-  const saved = localStorage.getItem('meals-tracker');
+  const saved = localStorage.getItem(STORAGE_KEY);
   return saved ? JSON.parse(saved) : { lastMealTime: null, mealsByDay: {} };
 };
 
 const saveMeals = (meals) => {
-  localStorage.setItem('meals-tracker', JSON.stringify(meals));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(meals));
 };
 
 const LastMeal = () => {
