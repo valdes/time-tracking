@@ -28,6 +28,9 @@
     const LUNCH = 'lunch';
     const DINNER = 'dinner';
     const SNACK = 'snack';
+    const COFFEE = 'coffee';
+    const TEA = 'tea';
+    const WATER = 'water';
     const CURRENT_DATA_VERSION = 1;
     const MIGRATIONS = [
       (data) => {
@@ -110,6 +113,18 @@ const LastMeal = () => {
     addMeal(DINNER, true);
   };
 
+  const addWater = () => {
+    addMeal(WATER, false);
+  };
+
+  const addCoffee = () => {
+    addMeal(COFFEE, false);
+  };
+
+  const addTea = () => {
+    addMeal(TEA, false);
+  };
+
   const addMeal = (type, needUpdateElapsepTime) => {
     const now = Date.now();
     const updatedMeals = { ...meals };
@@ -169,6 +184,45 @@ const LastMeal = () => {
         disabled={isAlreadyLogMealToday(DINNER)}
       >
         Dinner
+      </button>
+      <button
+        style={{
+          padding: '10px',
+          backgroundColor: '#28a745',
+          color: '#fff',
+          border: 'none',
+          cursor: 'pointer',
+          marginLeft: '10px'
+        }}
+        onClick={addWater}
+      >
+        Water
+      </button>
+      <button
+        style={{
+          padding: '10px',
+          backgroundColor: '#28a745',
+          color: '#fff',
+          border: 'none',
+          cursor: 'pointer',
+          marginLeft: '10px'
+        }}
+        onClick={addCoffee}
+      >
+        Coffee
+      </button>
+      <button
+        style={{
+          padding: '10px',
+          backgroundColor: '#28a745',
+          color: '#fff',
+          border: 'none',
+          cursor: 'pointer',
+          marginLeft: '10px'
+        }}
+        onClick={addTea}
+      >
+        Tea
       </button>
       <div style={{marginTop: '20px'}}>
         <strong>Today's meals:</strong>
