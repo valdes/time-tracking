@@ -99,6 +99,10 @@ const LastMeal = () => {
     updateMeal('snack', true);
   };
 
+  const addLunch = () => {
+    updateMeal('lunch', true);
+  };
+
   const updateMeal = (type, needUpdateElapsepTime) => {
     const now = Date.now();
     const updatedMeals = { ...meals };
@@ -109,6 +113,10 @@ const LastMeal = () => {
     setMeals(updatedMeals);
     saveMeals(updatedMeals);
   };
+
+  const isAlreadyLunchToday = () => {
+    return todayMeals.some(meal => meal.type === 'lunch');
+  }
 
   return (
     <div>
@@ -126,6 +134,20 @@ const LastMeal = () => {
         onClick={addSnack}
       >
         Snack
+      </button>
+      <button
+        style={{
+          padding: '10px',
+          backgroundColor: isAlreadyLunchToday() ? '#6c757d' : '#28a745',
+          color: '#fff',
+          border: 'none',
+          cursor: 'pointer',
+          marginLeft: '10px'
+        }}
+        onClick={addLunch}
+        disabled={isAlreadyLunchToday()}
+      >
+        Lunch
       </button>
       <div style={{marginTop: '20px'}}>
         <strong>Today's meals:</strong>
